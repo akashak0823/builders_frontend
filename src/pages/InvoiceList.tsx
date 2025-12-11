@@ -7,13 +7,13 @@ const InvoiceList: React.FC = () => {
     const [invoices, setInvoices] = useState<any[]>([]);
 
     useEffect(() => {
-        axios.get('https://builders-backend-ghve.onrender.com/invoices')
+        axios.get('http://localhost:5000/invoices')
             .then(res => setInvoices(res.data))
             .catch(err => console.error(err));
     }, []);
 
     const downloadPdf = (id: string) => {
-        window.open(`https://builders-backend-ghve.onrender.com/invoices/${id}/pdf`, '_blank');
+        window.open(`http://localhost:5000/invoices/${id}/pdf`, '_blank');
     };
 
     const columns = [
