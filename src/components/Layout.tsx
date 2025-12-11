@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, User, Settings } from 'lucide-react';
+import { LayoutDashboard, Package, FileText, List, LogOut, User, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { navItems } from '../config/nav';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -10,7 +9,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation();
-    const { user, logout, hasPermission } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -18,10 +17,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         navigate('/login');
     };
 
-    const filteredNavItems = navItems.filter(item => {
-        if (!item.permission) return true; // No permission required
-        return hasPermission(item.permission);
-    });
+    const navItems = [
+        { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+        { name: 'Products', path: '/products', icon: <Package size={20} /> },
+        { name: 'Create Invoice', path: '/invoices/new', icon: <FileText size={20} /> },
+        { name: 'Invoices', path: '/invoices', icon: <List size={20} /> },
+    ];
 
     return (
         <div className="flex h-screen bg-light-100 text-navy-900 font-sans overflow-hidden">
@@ -49,9 +50,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Navigation */}
                 <nav className="flex-1 px-4 mt-8 space-y-3 overflow-y-auto">
-                    {filteredNavItems.map((item) => {
+                    {navItems.map((item) => {
                         const isActive = location.pathname === item.path;
-                        const Icon = item.icon;
                         return (
                             <Link
                                 key={item.path}
@@ -62,9 +62,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     }`}
                             >
                                 <span className={`mr-4 relative z-10 ${isActive ? 'text-navy-900' : 'text-slate-400 group-hover:text-gold-400'}`}>
-                                    <Icon size={20} />
+                                    {item.icon}
                                 </span>
-                                <span className="relative z-10">{item.label}</span>
+                                <span className="relative z-10">{item.name}</span>
 
                                 {/* Active Indicator Bar */}
                                 {isActive && (
@@ -102,7 +102,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <header className="h-20 bg-light-100/80 backdrop-blur-md flex items-center justify-between px-10 z-10">
                     <div>
                         <h2 className="text-2xl font-montserrat font-bold text-navy-900">
-                            {navItems.find(i => i.path === location.pathname)?.label || (location.pathname === '/profile' ? 'Profile' : 'Dashboard')}
+                            {navItems.find(i => i.path === location.pathname)?.name || (location.pathname === '/profile' ? 'Profile' : 'Dashboard')}
                         </h2>
                         <p className="text-sm text-bluegrey-500">Welcome back, {user?.name || 'User'}</p>
                     </div>
@@ -113,7 +113,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </div>
                             <div className="text-right hidden md:block">
                                 <p className="text-sm font-bold text-navy-900">{user?.name || 'User'}</p>
-                                <p className="text-xs text-bluegrey-500">{user?.role?.name || 'Guest'}</p>
+                                <p className="text-xs text-bluegrey-500">{user?.role || 'Guest'}</p>
                             </div>
                         </div>
                     </div>
