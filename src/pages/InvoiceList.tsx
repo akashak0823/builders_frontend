@@ -6,14 +6,14 @@ const InvoiceList: React.FC = () => {
     const [invoices, setInvoices] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch('http://localhost:5000/invoices')
+        fetch('https://builders-backend-ghve.onrender.com/invoices')
             .then(res => res.json())
             .then(data => setInvoices(data))
             .catch(err => console.error(err));
     }, []);
 
     const downloadPdf = (id: string) => {
-        window.open(`http://localhost:5000/invoices/${id}/pdf`, '_blank');
+        window.open(`https://builders-backend-ghve.onrender.com/invoices/${id}/pdf`, '_blank');
     };
 
     const columns = [

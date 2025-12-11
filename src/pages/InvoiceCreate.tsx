@@ -11,7 +11,7 @@ const InvoiceCreate: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:5000/products')
+        fetch('https://builders-backend-ghve.onrender.com/products')
             .then(res => res.json())
             .then(data => {
                 const availableProducts = data.filter((p: any) => p.inStock && p.quantity > 0);
@@ -72,7 +72,7 @@ const InvoiceCreate: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/invoices', {
+            const res = await fetch('https://builders-backend-ghve.onrender.com/invoices', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ customer, items })
@@ -84,7 +84,7 @@ const InvoiceCreate: React.FC = () => {
                 setCustomer({ name: '', address: '', gstNumber: '' });
                 setItems([]);
                 // Download PDF
-                window.open(`http://localhost:5000/invoices/${data._id}/pdf`, '_blank');
+                window.open(`https://builders-backend-ghve.onrender.com/invoices/${data._id}/pdf`, '_blank');
             } else {
                 alert('Error creating invoice');
             }

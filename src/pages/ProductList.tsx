@@ -18,7 +18,7 @@ const ProductList: React.FC = () => {
     }, []);
 
     const fetchProducts = () => {
-        fetch('http://localhost:5000/products')
+        fetch('https://builders-backend-ghve.onrender.com/products')
             .then(res => res.json())
             .then(data => {
                 setProducts(data);
@@ -39,7 +39,7 @@ const ProductList: React.FC = () => {
     const handleStockToggle = async (product: any) => {
         try {
             const updatedProduct = { ...product, inStock: !product.inStock };
-            await fetch(`http://localhost:5000/products/${product._id}`, {
+            await fetch(`https://builders-backend-ghve.onrender.com/products/${product._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedProduct)
@@ -56,7 +56,7 @@ const ProductList: React.FC = () => {
 
         try {
             const updatedProduct = { ...product, quantity: newQuantity };
-            await fetch(`http://localhost:5000/products/${product._id}`, {
+            await fetch(`https://builders-backend-ghve.onrender.com/products/${product._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedProduct)
@@ -120,7 +120,7 @@ const ProductList: React.FC = () => {
 
         setUploading(true);
         try {
-            const res = await fetch('http://localhost:5000/upload', {
+            const res = await fetch('https://builders-backend-ghve.onrender.com/upload', {
                 method: 'POST',
                 body: formData
             });
@@ -150,13 +150,13 @@ const ProductList: React.FC = () => {
 
         try {
             if (currentProduct) {
-                await fetch(`http://localhost:5000/products/${currentProduct._id}`, {
+                await fetch(`https://builders-backend-ghve.onrender.com/products/${currentProduct._id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(productData)
                 });
             } else {
-                await fetch('http://localhost:5000/products', {
+                await fetch('https://builders-backend-ghve.onrender.com/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(productData)
@@ -171,7 +171,7 @@ const ProductList: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         if (confirm('Are you sure?')) {
-            await fetch(`http://localhost:5000/products/${id}`, { method: 'DELETE' });
+            await fetch(`https://builders-backend-ghve.onrender.com/products/${id}`, { method: 'DELETE' });
             fetchProducts();
         }
     };
