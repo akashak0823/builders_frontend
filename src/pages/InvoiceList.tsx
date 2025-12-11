@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../components/Table';
 import { Download, Eye } from 'lucide-react';
+import axios from 'axios';
 
 const InvoiceList: React.FC = () => {
     const [invoices, setInvoices] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch('https://builders-backend-ghve.onrender.com/invoices')
-            .then(res => res.json())
-            .then(data => setInvoices(data))
+        axios.get('http://localhost:5000/invoices')
+            .then(res => setInvoices(res.data))
             .catch(err => console.error(err));
     }, []);
 
     const downloadPdf = (id: string) => {
-        window.open(`https://builders-backend-ghve.onrender.com/invoices/${id}/pdf`, '_blank');
+        window.open(`http://localhost:5000/invoices/${id}/pdf`, '_blank');
     };
 
     const columns = [

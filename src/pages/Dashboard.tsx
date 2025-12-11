@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Card from '../components/Card';
+import { useAuth } from '../context/AuthContext';
 import { IndianRupee, Package, FileText, TrendingUp } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -18,12 +19,17 @@ const Dashboard: React.FC = () => {
         totalProducts: 0,
         recentInvoices: []
     });
+    const { hasPermission } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchStats = async () => {
+            if (!hasPermission('VIEW_ANALYTICS') && !hasPermission('VIEW_DASHBOARD_GLOBAL')) {
+                // If they only have Branch view, maybe we don't show full revenue stats or show limited
+                // For now, if the API returns data, we show it, assuming API filtered it.
+            }
             try {
-                const response = await axios.get('https://builders-backend-ghve.onrender.com/dashboard/stats');
+                const response = await axios.get('http://localhost:5000/dashboard/stats');
                 setStats(response.data);
             } catch (error) {
                 console.error('Failed to fetch dashboard stats:', error);
@@ -31,7 +37,7 @@ const Dashboard: React.FC = () => {
         };
 
         fetchStats();
-    }, []);
+    }, [hasPermission]);
 
     return (
         <div>
@@ -136,20 +142,24 @@ const Dashboard: React.FC = () => {
 
                 <Card title="Quick Actions">
                     <div className="grid grid-cols-2 gap-4">
-                        <button
-                            onClick={() => navigate('/invoices/new')}
-                            className="p-6 rounded-xl bg-navy-900 text-white hover:bg-navy-800 hover:-translate-y-1 transition-all shadow-lg flex flex-col items-center justify-center group"
-                        >
-                            <FileText size={32} className="mb-3 text-gold-400 group-hover:scale-110 transition-transform" />
-                            <span className="font-bold">New Invoice</span>
-                        </button>
-                        <button
-                            onClick={() => navigate('/products')}
-                            className="p-6 rounded-xl bg-white border border-slate-200 text-navy-900 hover:border-gold-400 hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col items-center justify-center group"
-                        >
-                            <Package size={32} className="mb-3 text-brown-500 group-hover:scale-110 transition-transform" />
-                            <span className="font-bold">Add Product</span>
-                        </button>
+                        {hasPermission('CREATE_INVOICE') && (
+                            <button
+                                onClick={() => navigate('/invoices/new')}
+                                className="p-6 rounded-xl bg-navy-900 text-white hover:bg-navy-800 hover:-translate-y-1 transition-all shadow-lg flex flex-col items-center justify-center group"
+                            >
+                                <FileText size={32} className="mb-3 text-gold-400 group-hover:scale-110 transition-transform" />
+                                <span className="font-bold">New Invoice</span>
+                            </button>
+                        )}
+                        {hasPermission('CREATE_PRODUCT') && (
+                            <button
+                                onClick={() => navigate('/products')}
+                                className="p-6 rounded-xl bg-white border border-slate-200 text-navy-900 hover:border-gold-400 hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col items-center justify-center group"
+                            >
+                                <Package size={32} className="mb-3 text-brown-500 group-hover:scale-110 transition-transform" />
+                                <span className="font-bold">Add Product</span>
+                            </button>
+                        )}
                     </div>
                 </Card>
             </div>
