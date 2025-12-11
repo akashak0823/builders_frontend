@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         delete axios.defaults.headers.common['Authorization'];
     };
 
-    const hasPermission = (permission: string): boolean => {
+    const hasPermission = (_permission: string): boolean => {
         // Bypass all permission checks as per user request to remove 3-level access
         if (!user) return false;
         return true;

@@ -23,7 +23,7 @@ const Profile: React.FC = () => {
                             {user.name.charAt(0).toUpperCase()}
                         </div>
                         <h3 className="text-xl font-bold text-navy-900 mb-1">{user.name}</h3>
-                        <p className="text-bluegrey-500 text-sm mb-4">{user.role}</p>
+                        <p className="text-bluegrey-500 text-sm mb-4">{user.role.name}</p>
                         <div className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
                             Active
                         </div>
@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
                                 </div>
                                 <div>
                                     <p className="text-xs text-bluegrey-500 uppercase font-bold">Role</p>
-                                    <p className="font-medium text-navy-900 capitalize">{user.role}</p>
+                                    <p className="font-medium text-navy-900 capitalize">{user.role.name}</p>
                                 </div>
                             </div>
                         </div>
