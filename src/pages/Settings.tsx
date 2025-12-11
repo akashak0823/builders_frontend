@@ -1,6 +1,6 @@
 import React from 'react';
 import Card from '../components/Card';
-import { useAuth } from '../context/AuthContext';
+
 import { Bell, Lock, User, Globe, Moon } from 'lucide-react';
 
 const Settings: React.FC = () => {

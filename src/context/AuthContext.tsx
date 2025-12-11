@@ -1,11 +1,23 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
+interface Permission {
+    _id: string;
+    name: string;
+    description: string;
+}
+
+interface Role {
+    _id: string;
+    name: string;
+    permissions: Permission[];
+}
+
 interface User {
     id: string;
     name: string;
     email: string;
-    role: string;
+    role: Role;
 }
 
 interface AuthContextType {
@@ -15,6 +27,7 @@ interface AuthContextType {
     logout: () => void;
     isAuthenticated: boolean;
     loading: boolean;
+    hasPermission: (permission: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,8 +69,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         delete axios.defaults.headers.common['Authorization'];
     };
 
+    const hasPermission = (permission: string): boolean => {
+        // Bypass all permission checks as per user request to remove 3-level access
+        if (!user) return false;
+        return true;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!user, loading }}>
+        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!user, loading, hasPermission }}>
             {children}
         </AuthContext.Provider>
     );

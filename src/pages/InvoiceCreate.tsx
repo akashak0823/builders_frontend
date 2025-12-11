@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/Card';
 import { Plus, Trash2, Save, ShoppingCart, FileText, Search } from 'lucide-react';
+import axios from 'axios';
+// import { useAuth } from '../context/AuthContext'; // Unused for now
 
 const InvoiceCreate: React.FC = () => {
+    // const { user } = useAuth(); 
+
     const [customer, setCustomer] = useState({ name: '', address: '', gstNumber: '' });
     const [items, setItems] = useState<any[]>([]);
     const [products, setProducts] = useState<any[]>([]);
@@ -11,15 +15,17 @@ const InvoiceCreate: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('https://builders-backend-ghve.onrender.com/products')
-            .then(res => res.json())
-            .then(data => {
-                const availableProducts = data.filter((p: any) => p.inStock && p.quantity > 0);
+        axios.get('https://builders-backend-ghve.onrender.com/products')
+            .then(res => {
+                const availableProducts = res.data.filter((p: any) => p.inStock && p.quantity > 0);
                 setProducts(availableProducts);
                 setFilteredProducts(availableProducts);
                 setLoading(false);
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, []);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,22 +78,14 @@ const InvoiceCreate: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('https://builders-backend-ghve.onrender.com/invoices', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customer, items })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert('Invoice Created Successfully!');
-                // Reset form
-                setCustomer({ name: '', address: '', gstNumber: '' });
-                setItems([]);
-                // Download PDF
-                window.open(`https://builders-backend-ghve.onrender.com/invoices/${data._id}/pdf`, '_blank');
-            } else {
-                alert('Error creating invoice');
-            }
+            const res = await axios.post('https://builders-backend-ghve.onrender.com/invoices', { customer, items });
+
+            alert('Invoice Created Successfully!');
+            // Reset form
+            setCustomer({ name: '', address: '', gstNumber: '' });
+            setItems([]);
+            // Download PDF
+            window.open(`https://builders-backend-ghve.onrender.com/invoices/${res.data._id}/pdf`, '_blank');
         } catch (error) {
             console.error(error);
             alert('Error creating invoice');

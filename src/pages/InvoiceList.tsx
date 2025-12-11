@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../components/Table';
 import { Download, Eye } from 'lucide-react';
+import axios from 'axios';
 
 const InvoiceList: React.FC = () => {
     const [invoices, setInvoices] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch('https://builders-backend-ghve.onrender.com/invoices')
-            .then(res => res.json())
-            .then(data => setInvoices(data))
+        axios.get('https://builders-backend-ghve.onrender.com/invoices')
+            .then(res => setInvoices(res.data))
             .catch(err => console.error(err));
     }, []);
 
