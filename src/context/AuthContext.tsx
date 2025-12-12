@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (token) {
                 try {
                     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                    const response = await axios.get('http://localhost:5000/auth/me');
+                    const response = await axios.get('https://builders-backend-ghve.onrender.com/auth/me');
                     setUser(response.data);
                 } catch (error) {
                     console.error('Auth check failed:', error);
@@ -89,3 +89,4 @@ export const useAuth = () => {
     }
     return context;
 };
+
