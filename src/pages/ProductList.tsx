@@ -17,7 +17,7 @@ const ProductList: React.FC = () => {
     }, []);
 
     const fetchProducts = () => {
-        axios.get('http://localhost:5000/products')
+        axios.get('https://builders-backend-ghve.onrender.com/products')
             .then(res => {
                 setProducts(res.data);
                 setFilteredProducts(res.data);
@@ -37,7 +37,7 @@ const ProductList: React.FC = () => {
     const handleStockToggle = async (product: any) => {
         try {
             const updatedProduct = { ...product, inStock: !product.inStock };
-            await axios.put(`http://localhost:5000/products/${product._id}`, updatedProduct);
+            await axios.put(`https://builders-backend-ghve.onrender.com/products/${product._id}`, updatedProduct);
             fetchProducts();
         } catch (error) {
             console.error(error);
@@ -50,7 +50,7 @@ const ProductList: React.FC = () => {
 
         try {
             const updatedProduct = { ...product, quantity: newQuantity };
-            await axios.put(`http://localhost:5000/products/${product._id}`, updatedProduct);
+            await axios.put(`https://builders-backend-ghve.onrender.com/products/${product._id}`, updatedProduct);
             fetchProducts();
         } catch (error) {
             console.error(error);
@@ -110,7 +110,7 @@ const ProductList: React.FC = () => {
 
         setUploading(true);
         try {
-            const res = await axios.post('http://localhost:5000/upload', formData, {
+            const res = await axios.post('https://builders-backend-ghve.onrender.com/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -140,9 +140,9 @@ const ProductList: React.FC = () => {
 
         try {
             if (currentProduct) {
-                await axios.put(`http://localhost:5000/products/${currentProduct._id}`, productData);
+                await axios.put(`https://builders-backend-ghve.onrender.com/products/${currentProduct._id}`, productData);
             } else {
-                await axios.post('http://localhost:5000/products', productData);
+                await axios.post('https://builders-backend-ghve.onrender.com/products', productData);
             }
             fetchProducts();
             setIsModalOpen(false);
@@ -153,7 +153,7 @@ const ProductList: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         if (confirm('Are you sure?')) {
-            await axios.delete(`http://localhost:5000/products/${id}`);
+            await axios.delete(`https://builders-backend-ghve.onrender.com/products/${id}`);
             fetchProducts();
         }
     };
@@ -265,3 +265,4 @@ const ProductList: React.FC = () => {
 };
 
 export default ProductList;
+
