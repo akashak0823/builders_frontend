@@ -28,8 +28,10 @@ const InvoiceCreate: React.FC = () => {
         setSearchQuery(query);
         const lowerQuery = query.toLowerCase();
         const filtered = products.filter(product =>
-            product.name.toLowerCase().includes(lowerQuery) ||
-            (product.productId && product.productId.toLowerCase().includes(lowerQuery))
+            (product.name || '').toLowerCase().includes(lowerQuery) ||
+            (product.productId && product.productId.toLowerCase().includes(lowerQuery)) ||
+            (product.category && product.category.toLowerCase().includes(lowerQuery)) ||
+            (product.unit && product.unit.toLowerCase().includes(lowerQuery))
         );
         setFilteredProducts(filtered);
     };
@@ -104,7 +106,7 @@ const InvoiceCreate: React.FC = () => {
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Search by Product ID or Name..."
+                            placeholder="Search by ID, Name, Category, or Unit..."
                             value={searchQuery}
                             onChange={handleSearch}
                             className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-gold-400"
@@ -152,15 +154,15 @@ const InvoiceCreate: React.FC = () => {
             </div>
 
             {/* Right Side: Invoice Form */}
-            <div className="lg:w-1/2 flex flex-col h-auto lg:h-full">
-                <Card className="flex-1 flex flex-col overflow-hidden !p-0 border-t-4 border-gold-400">
+            <div className="lg:w-1/2 flex flex-col h-fit">
+                <Card className="flex flex-col !p-0 border-t-4 border-gold-400">
                     <div className="p-6 border-b border-slate-100 bg-white">
                         <h2 className="text-xl font-montserrat font-bold text-navy-900 flex items-center">
                             <FileText className="mr-2 text-gold-400" /> New Invoice
                         </h2>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    <div className="p-6 space-y-6">
                         {/* Customer Details */}
                         <div className="space-y-4">
                             <h3 className="text-sm font-bold text-bluegrey-500 uppercase tracking-wider">Customer Details</h3>

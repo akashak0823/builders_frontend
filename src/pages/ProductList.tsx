@@ -31,8 +31,10 @@ const ProductList: React.FC = () => {
     const handleSearch = (query: string) => {
         const lowerQuery = query.toLowerCase();
         const filtered = products.filter(product =>
-            product.name.toLowerCase().includes(lowerQuery) ||
-            product.productId.toLowerCase().includes(lowerQuery)
+            (product.name || '').toLowerCase().includes(lowerQuery) ||
+            (product.productId || '').toLowerCase().includes(lowerQuery) ||
+            (product.category || '').toLowerCase().includes(lowerQuery) ||
+            (product.unit || '').toLowerCase().includes(lowerQuery)
         );
         setFilteredProducts(filtered);
     };
@@ -70,6 +72,18 @@ const ProductList: React.FC = () => {
 
     const columns = [
         { header: 'Product ID', accessor: 'productId' as const },
+        {
+            header: 'Image',
+            accessor: (item: any) => (
+                item.image ? (
+                    <img src={item.image} alt={item.name} className="h-10 w-10 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                ) : (
+                    <div className="h-10 w-10 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] text-slate-400 font-bold border border-slate-200">
+                        No Img
+                    </div>
+                )
+            )
+        },
         { header: 'Name', accessor: 'name' as const },
         { header: 'Category', accessor: 'category' as const },
         {
@@ -200,6 +214,7 @@ const ProductList: React.FC = () => {
                 data={filteredProducts}
                 columns={columns}
                 onSearch={handleSearch}
+                searchPlaceholder="Search by ID, name, category, or unit..."
                 actions={(item) => (
                     <div className="flex justify-end space-x-2">
                         <button onClick={() => openModal(item)} className="p-2 text-navy-900 hover:bg-gold-400/20 rounded-full transition-colors">
