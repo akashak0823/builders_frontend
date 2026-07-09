@@ -38,9 +38,9 @@ function Table<T extends { id?: string | number }>({ data, columns, onSearch, se
                     <Search className="absolute left-4 top-3.5 text-bluegrey-500" size={20} />
                 </div>
             )}
-            <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white">
-                <table className="w-full text-left text-sm text-bluegrey-500">
-                    <thead className="bg-navy-900 text-white uppercase font-bold tracking-wider">
+            <div className="w-full bg-transparent md:bg-white md:rounded-xl md:border md:border-slate-200 md:shadow-sm md:overflow-hidden">
+                <table className="w-full block md:table text-left text-sm text-bluegrey-500">
+                    <thead className="hidden md:table-header-group bg-navy-900 text-white uppercase font-bold tracking-wider">
                         <tr>
                             {columns.map((col, idx) => (
                                 <th key={idx} className={`px-6 py-4 ${col.className || ''}`}>{col.header}</th>
@@ -48,21 +48,29 @@ function Table<T extends { id?: string | number }>({ data, columns, onSearch, se
                             {actions && <th className="px-6 py-4 text-right">Actions</th>}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="block md:table-row-group divide-y-0 md:divide-y md:divide-slate-100 space-y-4 md:space-y-0">
                         {data.length > 0 ? (
                             data.map((item, idx) => (
-                                <tr key={item.id || idx} className="hover:bg-gold-400/5 transition-colors group">
+                                <tr key={item.id || idx} className="block md:table-row hover:bg-gold-400/5 transition-colors group bg-white rounded-xl border border-slate-200 md:border-none p-4 md:p-0 shadow-sm md:shadow-none mb-4 md:mb-0">
                                     {columns.map((col, colIdx) => (
-                                        <td key={colIdx} className={`px-6 py-4 font-medium text-navy-900 ${col.className || ''}`}>
-                                            {typeof col.accessor === 'function' ? col.accessor(item) : (item[col.accessor] as React.ReactNode)}
+                                        <td key={colIdx} className={`px-1 py-2 md:px-6 md:py-4 font-medium text-navy-900 flex justify-between items-center md:table-cell border-b border-slate-100 md:border-none last:border-b-0 ${col.className || ''}`}>
+                                            <span className="md:hidden font-bold text-slate-400 text-[10px] uppercase tracking-wider">{col.header}</span>
+                                            <div className="text-right md:text-left">
+                                                {typeof col.accessor === 'function' ? col.accessor(item) : (item[col.accessor] as React.ReactNode)}
+                                            </div>
                                         </td>
                                     ))}
-                                    {actions && <td className="px-6 py-4 text-right opacity-0 group-hover:opacity-100 transition-opacity">{actions(item)}</td>}
+                                    {actions && (
+                                        <td className="px-1 py-2 md:px-6 md:py-4 text-right flex justify-between items-center md:table-cell border-none">
+                                            <span className="md:hidden font-bold text-slate-400 text-[10px] uppercase tracking-wider">Actions</span>
+                                            <div className="flex justify-end">{actions(item)}</div>
+                                        </td>
+                                    )}
                                 </tr>
                             ))
                         ) : (
-                            <tr>
-                                <td colSpan={columns.length + (actions ? 1 : 0)} className="px-6 py-8 text-center text-slate-400">
+                            <tr className="block md:table-row">
+                                <td colSpan={columns.length + (actions ? 1 : 0)} className="block md:table-cell px-6 py-8 text-center text-slate-400 bg-white rounded-xl border border-slate-200 md:border-none">
                                     No data found.
                                 </td>
                             </tr>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../config';
 import { Lock, Mail } from 'lucide-react';
 
 const Login: React.FC = () => {
@@ -15,7 +16,7 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError('');
         try {
-            const response = await axios.post('https://builders-backend-ghve.onrender.com/auth/login', { email, password });
+            const response = await axios.post(`${API_URL}/auth/login`, { email, password });
             login(response.data.token, response.data.user);
             navigate('/');
         } catch (err: any) {
@@ -86,4 +87,3 @@ const Login: React.FC = () => {
 };
 
 export default Login;
-

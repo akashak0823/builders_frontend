@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, User, Settings } from 'lucide-react';
+import { LayoutDashboard, Package, FileText, List, LogOut, User, Settings, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { navItems } from '../config/nav';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -10,32 +9,59 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation();
-    const { user, logout, hasPermission } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Close sidebar on path change (mobile screen navigation)
+    useEffect(() => {
+        setIsSidebarOpen(false);
+    }, [location.pathname]);
 
     const handleLogout = () => {
         logout();
         navigate('/login');
     };
 
-    const filteredNavItems = navItems.filter(item => {
-        if (!item.permission) return true; // No permission required
-        return hasPermission(item.permission);
-    });
+    const navItems = [
+        { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+        { name: 'Products', path: '/products', icon: <Package size={20} /> },
+        { name: 'Create Invoice', path: '/invoices/new', icon: <FileText size={20} /> },
+        { name: 'Invoices', path: '/invoices', icon: <List size={20} /> },
+    ];
 
     return (
         <div className="flex h-screen bg-light-100 text-navy-900 font-sans overflow-hidden">
+            {/* Mobile Sidebar Backdrop Overlay */}
+            <div 
+                className={`fixed inset-0 bg-navy-950/40 backdrop-blur-sm z-20 transition-opacity duration-300 lg:hidden ${
+                    isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                }`} 
+                onClick={() => setIsSidebarOpen(false)}
+            />
+
             {/* Sidebar */}
-            <aside className="w-72 bg-navy-900 flex flex-col shadow-2xl z-20 relative">
+            <aside 
+                className={`w-72 bg-navy-900 flex flex-col shadow-2xl z-30 fixed inset-y-0 left-0 transition-transform duration-300 transform lg:static lg:translate-x-0 ${
+                    isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}
+            >
                 {/* Logo Section */}
-                <div className="p-8 flex flex-col items-center border-b border-navy-800/50">
+                <div className="p-8 flex flex-col items-center border-b border-navy-800/50 relative">
+                    {/* Mobile Close Button */}
+                    <button 
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="lg:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-lg"
+                    >
+                        <X size={20} />
+                    </button>
+
                     <div className="w-24 h-24 bg-white rounded-2xl p-2 shadow-lg mb-4 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
                         <img
                             src="/logo.png"
                             alt="builders bazaar Logo"
                             className="w-full h-full object-contain"
                             onError={(e) => {
-                                // Fallback if image fails
                                 (e.target as HTMLImageElement).style.display = 'none';
                                 (e.target as HTMLImageElement).parentElement!.innerText = 'LOGO';
                             }}
@@ -49,9 +75,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Navigation */}
                 <nav className="flex-1 px-4 mt-8 space-y-3 overflow-y-auto">
-                    {filteredNavItems.map((item) => {
+                    {navItems.map((item) => {
                         const isActive = location.pathname === item.path;
-                        const Icon = item.icon;
                         return (
                             <Link
                                 key={item.path}
@@ -62,11 +87,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     }`}
                             >
                                 <span className={`mr-4 relative z-10 ${isActive ? 'text-navy-900' : 'text-slate-400 group-hover:text-gold-400'}`}>
-                                    <Icon size={20} />
+                                    {item.icon}
                                 </span>
-                                <span className="relative z-10">{item.label}</span>
+                                <span className="relative z-10">{item.name}</span>
 
-                                {/* Active Indicator Bar */}
                                 {isActive && (
                                     <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-navy-900/20"></div>
                                 )}
@@ -99,28 +123,38 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-navy-900/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
                 {/* Header */}
-                <header className="h-20 bg-light-100/80 backdrop-blur-md flex items-center justify-between px-10 z-10">
-                    <div>
-                        <h2 className="text-2xl font-montserrat font-bold text-navy-900">
-                            {navItems.find(i => i.path === location.pathname)?.label || (location.pathname === '/profile' ? 'Profile' : 'Dashboard')}
-                        </h2>
-                        <p className="text-sm text-bluegrey-500">Welcome back, {user?.name || 'User'}</p>
+                <header className="h-20 bg-light-100/80 backdrop-blur-md flex items-center justify-between px-4 md:px-10 z-10 border-b border-slate-200">
+                    <div className="flex items-center">
+                        {/* Hamburger Button */}
+                        <button 
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="lg:hidden p-2 text-navy-900 hover:bg-slate-200 rounded-lg mr-3 transition-colors"
+                        >
+                            <Menu size={24} />
+                        </button>
+                        <div>
+                            <h2 className="text-lg md:text-2xl font-montserrat font-bold text-navy-900 leading-tight">
+                                {navItems.find(i => i.path === location.pathname)?.name || (location.pathname === '/profile' ? 'Profile' : 'Dashboard')}
+                            </h2>
+                            <p className="text-xs md:text-sm text-bluegrey-500">Welcome back, {user?.name || 'User'}</p>
+                        </div>
                     </div>
+                    
                     <div className="flex items-center space-x-6">
-                        <div className="flex items-center space-x-3 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200">
-                            <div className="w-10 h-10 rounded-full bg-navy-900 flex items-center justify-center text-gold-400 font-bold shadow-md">
+                        <div className="flex items-center space-x-3 bg-white px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-sm border border-slate-200">
+                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-navy-900 flex items-center justify-center text-gold-400 font-bold shadow-md">
                                 {user?.name?.charAt(0).toUpperCase() || 'U'}
                             </div>
-                            <div className="text-right hidden md:block">
-                                <p className="text-sm font-bold text-navy-900">{user?.name || 'User'}</p>
-                                <p className="text-xs text-bluegrey-500">{user?.role?.name || 'Guest'}</p>
+                            <div className="text-right hidden sm:block">
+                                <p className="text-xs md:text-sm font-bold text-navy-900">{user?.name || 'User'}</p>
+                                <p className="text-[10px] md:text-xs text-bluegrey-500">{user?.role || 'Guest'}</p>
                             </div>
                         </div>
                     </div>
                 </header>
 
                 {/* Content Scroll Area */}
-                <div className="flex-1 overflow-y-auto p-10">
+                <div className="flex-1 overflow-y-auto p-4 md:p-10">
                     {children}
                 </div>
             </main>

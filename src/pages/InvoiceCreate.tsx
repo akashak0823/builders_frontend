@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/Card';
 import { Plus, Trash2, Save, ShoppingCart, FileText, Search } from 'lucide-react';
-import axios from 'axios';
-// import { useAuth } from '../context/AuthContext'; // Unused for now
+import { API_URL } from '../config';
 
 const InvoiceCreate: React.FC = () => {
-    // const { user } = useAuth(); 
-
     const [customer, setCustomer] = useState({ name: '', address: '', gstNumber: '' });
     const [items, setItems] = useState<any[]>([]);
     const [products, setProducts] = useState<any[]>([]);
@@ -15,17 +12,15 @@ const InvoiceCreate: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('https://builders-backend-ghve.onrender.com/products')
-            .then(res => {
-                const availableProducts = res.data.filter((p: any) => p.inStock && p.quantity > 0);
+        fetch(`${API_URL}/products`)
+            .then(res => res.json())
+            .then(data => {
+                const availableProducts = data.filter((p: any) => p.inStock && p.quantity > 0);
                 setProducts(availableProducts);
                 setFilteredProducts(availableProducts);
                 setLoading(false);
             })
-            .catch(err => {
-                console.error(err);
-                setLoading(false);
-            });
+            .catch(err => console.error(err));
     }, []);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,14 +73,22 @@ const InvoiceCreate: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await axios.post('https://builders-backend-ghve.onrender.com/invoices', { customer, items });
-
-            alert('Invoice Created Successfully!');
-            // Reset form
-            setCustomer({ name: '', address: '', gstNumber: '' });
-            setItems([]);
-            // Download PDF
-            window.open(`https://builders-backend-ghve.onrender.com/invoices/${res.data._id}/pdf`, '_blank');
+            const res = await fetch(`${API_URL}/invoices`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customer, items })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Invoice Created Successfully!');
+                // Reset form
+                setCustomer({ name: '', address: '', gstNumber: '' });
+                setItems([]);
+                // Download PDF
+                window.open(`${API_URL}/invoices/${data._id}/pdf`, '_blank');
+            } else {
+                alert('Error creating invoice');
+            }
         } catch (error) {
             console.error(error);
             alert('Error creating invoice');
@@ -93,9 +96,9 @@ const InvoiceCreate: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-140px)]">
+        <div className="flex flex-col lg:flex-row gap-8 lg:h-[calc(100vh-140px)] h-auto pb-10 lg:pb-0">
             {/* Left Side: Product Grid */}
-            <div className="lg:w-1/2 overflow-y-auto pr-2">
+            <div className="lg:w-1/2 lg:overflow-y-auto pr-2 h-auto lg:h-full">
                 <div className="sticky top-0 bg-light-100 py-2 z-50 mb-4">
                     <h2 className="text-xl font-montserrat font-bold text-navy-900 mb-4">Select Products</h2>
                     <div className="relative">
@@ -149,7 +152,7 @@ const InvoiceCreate: React.FC = () => {
             </div>
 
             {/* Right Side: Invoice Form */}
-            <div className="lg:w-1/2 flex flex-col h-full">
+            <div className="lg:w-1/2 flex flex-col h-auto lg:h-full">
                 <Card className="flex-1 flex flex-col overflow-hidden !p-0 border-t-4 border-gold-400">
                     <div className="p-6 border-b border-slate-100 bg-white">
                         <h2 className="text-xl font-montserrat font-bold text-navy-900 flex items-center">
@@ -248,4 +251,3 @@ const InvoiceCreate: React.FC = () => {
 };
 
 export default InvoiceCreate;
-

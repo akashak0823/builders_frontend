@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
 import { Plus, Edit, Trash2, Minus } from 'lucide-react';
-import axios from 'axios';
+import { API_URL } from '../config';
+
+
 
 const ProductList: React.FC = () => {
     const [products, setProducts] = useState<any[]>([]);
@@ -17,10 +19,11 @@ const ProductList: React.FC = () => {
     }, []);
 
     const fetchProducts = () => {
-        axios.get('https://builders-backend-ghve.onrender.com/products')
-            .then(res => {
-                setProducts(res.data);
-                setFilteredProducts(res.data);
+        fetch(`${API_URL}/products`)
+            .then(res => res.json())
+            .then(data => {
+                setProducts(data);
+                setFilteredProducts(data);
             })
             .catch(err => console.error(err));
     };
@@ -37,7 +40,11 @@ const ProductList: React.FC = () => {
     const handleStockToggle = async (product: any) => {
         try {
             const updatedProduct = { ...product, inStock: !product.inStock };
-            await axios.put(`https://builders-backend-ghve.onrender.com/products/${product._id}`, updatedProduct);
+            await fetch(`${API_URL}/products/${product._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedProduct)
+            });
             fetchProducts();
         } catch (error) {
             console.error(error);
@@ -50,7 +57,11 @@ const ProductList: React.FC = () => {
 
         try {
             const updatedProduct = { ...product, quantity: newQuantity };
-            await axios.put(`https://builders-backend-ghve.onrender.com/products/${product._id}`, updatedProduct);
+            await fetch(`${API_URL}/products/${product._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedProduct)
+            });
             fetchProducts();
         } catch (error) {
             console.error(error);
@@ -110,12 +121,12 @@ const ProductList: React.FC = () => {
 
         setUploading(true);
         try {
-            const res = await axios.post('https://builders-backend-ghve.onrender.com/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+            const res = await fetch(`${API_URL}/upload`, {
+                method: 'POST',
+                body: formData
             });
-            setImageUrl(res.data.url);
+            const data = await res.json();
+            setImageUrl(data.url);
             setUploading(false);
         } catch (error) {
             console.error('Upload failed:', error);
@@ -140,9 +151,17 @@ const ProductList: React.FC = () => {
 
         try {
             if (currentProduct) {
-                await axios.put(`https://builders-backend-ghve.onrender.com/products/${currentProduct._id}`, productData);
+                await fetch(`${API_URL}/products/${currentProduct._id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productData)
+                });
             } else {
-                await axios.post('https://builders-backend-ghve.onrender.com/products', productData);
+                await fetch(`${API_URL}/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productData)
+                });
             }
             fetchProducts();
             setIsModalOpen(false);
@@ -153,7 +172,7 @@ const ProductList: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         if (confirm('Are you sure?')) {
-            await axios.delete(`https://builders-backend-ghve.onrender.com/products/${id}`);
+            await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
             fetchProducts();
         }
     };
@@ -265,4 +284,3 @@ const ProductList: React.FC = () => {
 };
 
 export default ProductList;
-
